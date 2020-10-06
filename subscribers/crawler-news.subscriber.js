@@ -1,32 +1,5 @@
-const express = require('express')
 const scrapeIt = require("scrape-it");
-const app = express()
-var multer = require('multer');
-var upload = multer();
-var path = require('path');
-const port = 3000
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(upload.array());
-app.use(express.static('public'));
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname + '/index.html'));
-})
-
-app.post('/scrapingNews', async (req, res) => {
-    try {
-        var filter = req.body.filter;
-        const resp = await scrapeNewsPage(filter);
-        res.send(resp);
-    } catch (error) {
-        handleError(error);
-    }
-})
-
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
-})
+const filterData = require('../services/filter-news.service');
 
 const scrapeNewsPage = function (filter) {
     return new Promise(function (resolve, reject) {
@@ -69,20 +42,15 @@ const scrapeNewsPage = function (filter) {
                 ...data.newsEntriesMetaInfo.find((item) => (item.id === itm.id) && item),
                 ...itm
             }));
-            //Filters
             if (filter == "1") {
-                mergedList = mergedList.filter(function (x) {
-                    return x.title.trim().split(" ").length > 4;
-                });
-                mergedList.sort((a, b) => (Number(a.coments) < Number(b.coments)) ? 1 : ((Number(b.coments) < Number(a.coments)) ? -1 : 0));
+                mergedList = filterData.filterByComments(mergedList)
             }
             if (filter == "2") {
-                mergedList = mergedList.filter(function (x) {
-                    return x.title.trim().split(" ").length <= 4;
-                });
-                mergedList.sort((a, b) => (Number(a.score) < Number(b.score)) ? 1 : ((Number(b.score) < Number(a.score)) ? -1 : 0));
+                mergedList = filterData.filterByScore(mergedList)
             }
             resolve(mergedList)
         })
     })
 }
+
+module.exports = scrapeNewsPage
