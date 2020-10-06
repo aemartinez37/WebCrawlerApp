@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.js"></script>
+    <script
+        src="https://unpkg.com/bootstrap-table@1.15.5/dist/extensions/export/bootstrap-table-export.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css">
+    <link href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Web Crawler</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <span class="navbar-brand mb-0 h1"><strong>Web Crawler</strong> (https://news.ycombinator.com)</span>
+    </nav>
+    <br>
+    <div class="container">
+        <span>Filters: </span>
+        <div class="input-group">
+            <select class="custom-select" id="filerSelection">
+                <option selected>Choose filter for entries... (No filter)</option>
+                <option value="1">More than five words in the title ordered by the amount of comments first</option>
+                <option value="2">Less than or equal to five words in the title ordered by points (score)</option>
+            </select>
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="scrapeNews()">Apply!</button>
+            </div>
+        </div>
+        <br>
+
+        <div class="progress">
+            <span>Loading...</span>
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75"
+                aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+        </div>
+        <br>
+        <table id="table" class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th data-field="orderNumber">Order Number</th>
+                    <th data-field="title">Title</th>
+                    <th data-field="score">Score</th>
+                    <th data-field="coments">Comments #</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+
+    <script>
+        function scrapeNews() {
+            var selectionFilter = $('#filerSelection').val();
+            var jsonReq = { filter: "0" };
+            if (selectionFilter == "1") {
+                jsonReq.filter = 1;
+            }
+            if (selectionFilter == "2") {
+                jsonReq.filter = 2;
+            }
+            $('.progress').show();
+            $.post("scrapingNews", jsonReq, function (dataNews) {
+                var $table = $('#table');
+                $('#table').bootstrapTable({
+                    data: dataNews
+                });
+                $('#table').bootstrapTable('load', dataNews);
+                $('.progress').hide();
+            });
+        }
+    </script>
+    <script>
+        $(document).ready(scrapeNews());
+    </script>
+</body>
+
+</html>

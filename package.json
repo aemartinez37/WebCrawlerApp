@@ -1,0 +1,16 @@
+{
+  "name": "webcrawlernode",
+  "version": "1.0.0",
+  "description": "Web Crawler Using NodeJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Andres M.",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "multer": "^1.4.2",
+    "scrape-it": "^5.2.4"
+  }
+}
