@@ -38,10 +38,33 @@ const scrapeNewsPage = function (filter) {
                 x['coments'] = x['coments'].length > 3 ? x['coments'][3].includes("comment") ? x['coments'][3].replace(/\u00a0/g, " ").split(" ")[0] : "0" : "0"
                 return x;
             });
-            var mergedList = data.newsEntries.map(itm => ({
-                ...data.newsEntriesMetaInfo.find((item) => (item.id === itm.id) && item),
-                ...itm
-            }));
+            let mergedList = data.newsEntries.map((entry) => {
+              const newsItem = {
+                id: (function () {
+                  return entry.id;
+                })(),
+                title: (function () {
+                  return entry.title;
+                })(),
+                orderNumber: (function () {
+                  return entry.orderNumber;
+                })(),
+              };
+              const newsItemMetaInfo = {
+                ...data.newsEntriesMetaInfo.find(
+                  (item) => item.id === entry.id
+                ),
+              };
+              const newsRatedItem = {
+                score: Number(newsItemMetaInfo.score) || 0,
+                coments: Number(newsItemMetaInfo.score) || 0,
+                __proto__: newsItem,
+              };
+              return {
+                ...newsRatedItem,
+                ...Object.getPrototypeOf(newsRatedItem),
+              };
+            });
             if (filter == "1") {
                 mergedList = filterData.filterByComments(mergedList)
             }
