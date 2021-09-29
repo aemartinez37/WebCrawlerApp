@@ -1,5 +1,6 @@
 const scrapeIt = require("scrape-it");
-const filterData = require('../services/filter-news.service');
+const News = require("../classes/News");
+const filterFunctions = require('../services/filter-news.service');
 
 const scrapeNewsPage = function (filter) {
     return new Promise(function (resolve, reject) {
@@ -65,13 +66,18 @@ const scrapeNewsPage = function (filter) {
                 ...Object.getPrototypeOf(newsRatedItem),
               };
             });
+            
+            //Mixins
+            Object.assign(News.prototype, filterFunctions);
+            const newsObj = new News(mergedList);
+
             if (filter == "1") {
-                mergedList = filterData.filterByComments(mergedList)
+              newsObj.filterByComments();
             }
             if (filter == "2") {
-                mergedList = filterData.filterByScore(mergedList)
+              newsObj.filterByScore();
             }
-            resolve(mergedList)
+            resolve(newsObj.mergedList);
         })
     })
 }
